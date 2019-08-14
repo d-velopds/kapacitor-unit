@@ -66,6 +66,7 @@ func (t Test) String() string {
 
 // Adds test data
 func (t *Test) addData(k io.Kapacitor, i io.Influxdb) error {
+	glog.Info("DEBUG:: Adding data")
 	t.CreateTimestamps()
 
 	switch t.Type {
@@ -121,7 +122,7 @@ func (t *Test) CreateTimestamps() {
 
 // Creates all necessary artifacts in database to run the test
 func (t *Test) setup(k io.Kapacitor, i io.Influxdb) error {
-	glog.Info("DEBUG:: setup test: ", t.Name)
+	glog.Info("DEBUG:: setup test1: ", t.Name)
 	switch t.Type {
 	case "batch":
 		err := i.Setup(t.Db, t.Rp)
