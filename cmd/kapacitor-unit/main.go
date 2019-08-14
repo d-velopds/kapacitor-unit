@@ -52,7 +52,7 @@ func main() {
 			log.Println("Error running test: ", t, " Error: ", err)
 			continue
 		}
-		if !t.Passed {
+		if !t.Result.Passed {
 			testFailed = true
 		}
 		//Prints test output
