@@ -66,6 +66,8 @@ func (t Test) String() string {
 
 // Adds test data
 func (t *Test) addData(k io.Kapacitor, i io.Influxdb) error {
+	t.CreateTimestamps()
+
 	switch t.Type {
 	case "stream":
 		// adds data to kapacitor
@@ -126,8 +128,6 @@ func (t *Test) setup(k io.Kapacitor, i io.Influxdb) error {
 			return err
 		}
 	}
-
-	t.CreateTimestamps()
 
 	// Loads test task to kapacitor
 	f := map[string]interface{}{
