@@ -5,11 +5,14 @@ package test
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/golang/glog"
 	"github.com/gpestana/kapacitor-unit/io"
 	"github.com/gpestana/kapacitor-unit/task"
-	"time"
-	"regexp"
 )
 
 type Test struct {
@@ -91,6 +94,28 @@ func (t *Test) Validate() error {
 	return nil
 }
 
+func (t *Test) CreateTimestamps() {
+	now := time.Now().Unix()
+	for i, sample := range t.Data {
+		parts := strings.Split(sample, " ")
+		stampSpec := parts[len(parts)-1]
+		re := regexp.MustCompile(`(\+|\-)(\d+)(m)`)
+		if re.MatchString(stampSpec) {
+			matchParts := re.FindStringSubmatch(stampSpec)
+			n, _ := strconv.Atoi(matchParts[2])
+			add := int64(n * 60)
+			stamp := int64(0)
+			if matchParts[1] == "-" {
+				stamp = now - add
+			} else {
+				stamp = now + add
+			}
+			parts[len(parts)-1] = strconv.FormatInt(stamp, 10)
+			t.Data[i] = strings.Join(parts[:], " ")
+		}
+	}
+}
+
 // Creates all necessary artifacts in database to run the test
 func (t *Test) setup(k io.Kapacitor, i io.Influxdb) error {
 	glog.Info("DEBUG:: setup test: ", t.Name)
@@ -101,6 +126,8 @@ func (t *Test) setup(k io.Kapacitor, i io.Influxdb) error {
 			return err
 		}
 	}
+
+	t.CreateTimestamps()
 
 	// Loads test task to kapacitor
 	f := map[string]interface{}{
