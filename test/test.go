@@ -99,6 +99,7 @@ func (t *Test) Validate() error {
 func (t *Test) CreateTimestamps() {
 	now := time.Now().Unix()
 	for i, sample := range t.Data {
+		glog.Info("DEBUG:: Processing sample " + sample)
 		parts := strings.Split(sample, " ")
 		stampSpec := parts[len(parts)-1]
 		re := regexp.MustCompile(`(\+|\-)(\d+)(m)`)
