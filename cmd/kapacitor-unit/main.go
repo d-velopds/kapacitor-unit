@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/fatih/color"
 	"github.com/gpestana/kapacitor-unit/cli"
 	"github.com/gpestana/kapacitor-unit/io"
 	"github.com/gpestana/kapacitor-unit/task"
 	"github.com/gpestana/kapacitor-unit/test"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"log"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type TestCollection []test.Test
@@ -33,6 +34,7 @@ func main() {
 		log.Fatal("Init Tests failed: ", err)
 	}
 
+	testFailed := false
 	// Validates, runs tests in series and print results
 	for _, t := range tests {
 		if err := t.Validate(); err != nil {
@@ -50,10 +52,17 @@ func main() {
 			log.Println("Error running test: ", t, " Error: ", err)
 			continue
 		}
+		if !t.Passed {
+			testFailed = true
+		}
 		//Prints test output
 		setColor(t)
 		log.Println(t)
 		color.Unset()
+	}
+
+	if testFailed {
+		os.Exit(1)
 	}
 }
 
