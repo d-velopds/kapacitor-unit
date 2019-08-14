@@ -2,8 +2,9 @@ package io
 
 import (
 	"bytes"
-	"github.com/golang/glog"
 	"net/http"
+
+	"github.com/golang/glog"
 )
 
 // Influxdb service configurations
@@ -28,7 +29,7 @@ func (influxdb Influxdb) Data(data []string, db string, rp string) error {
 		if err != nil {
 			return err
 		}
-		glog.Info("DEBUG:: Influxdb added ["+d+"] to "+url)
+		glog.Info("DEBUG:: Influxdb added [" + d + "] to " + url)
 	}
 	return nil
 }
@@ -40,7 +41,7 @@ func (influxdb Influxdb) Setup(db string, rp string) error {
 	if rp == "" {
 		rp = "autogen"
 	}
-	q := "q=CREATE DATABASE \""+db+"\" WITH DURATION 1h REPLICATION 1 NAME \""+rp+"\""
+	q := "q=CREATE DATABASE \"" + db + "\" WITH DURATION 1h REPLICATION 1 NAME \"" + rp + "\""
 	baseUrl := influxdb.Host + "/query"
 	_, err := influxdb.Client.Post(baseUrl, "application/x-www-form-urlencoded",
 		bytes.NewBuffer([]byte(q)))
@@ -51,7 +52,7 @@ func (influxdb Influxdb) Setup(db string, rp string) error {
 }
 
 func (influxdb Influxdb) CleanUp(db string) error {
-	q := "q=DROP DATABASE \""+db+"\""
+	q := "q=DROP DATABASE \"" + db + "\""
 	baseUrl := influxdb.Host + "/query"
 	_, err := influxdb.Client.Post(baseUrl, "application/x-www-form-urlencoded",
 		bytes.NewBuffer([]byte(q)))
@@ -59,5 +60,17 @@ func (influxdb Influxdb) CleanUp(db string) error {
 		return err
 	}
 	glog.Info("DEBUG:: Influxdb cleanup database ", q)
+	return nil
+}
+
+func (influxdb Influxdb) CleanUpSeries(db string) error {
+	q := "q=DROP SERIES FROM /.*/"
+	baseUrl := influxdb.Host + "/query"
+	_, err := influxdb.Client.Post(baseUrl, "application/x-www-form-urlencoded",
+		bytes.NewBuffer([]byte(q)))
+	if err != nil {
+		return err
+	}
+	glog.Info("DEBUG:: Influxdb cleanup series ", q)
 	return nil
 }

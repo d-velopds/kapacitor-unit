@@ -163,11 +163,19 @@ func (t *Test) wait() {
 // Deletes data, database and retention policies created to run the test
 func (t *Test) teardown(k io.Kapacitor, i io.Influxdb) {
 	glog.Info("DEBUG:: teardown test: ", t.Name)
-	err := i.CleanUp(t.Db)
-	if err != nil {
-		glog.Error("Error performing teardown in cleanup. error: ", err)
+	switch t.Type {
+	case "batch":
+		err := i.CleanUp(t.Db)
+		if err != nil {
+			glog.Error("Error performing teardown in cleanup. error: ", err)
+		}
+	case "stream":
+		err := i.CleanUpSeries(t.Db)
+		if err != nil {
+			glog.Error("Error performing teardown in cleanup. error: ", err)
+		}
 	}
-	err = k.Delete(t.TaskName)
+	err := k.Delete(t.TaskName)
 	if err != nil {
 		glog.Error("Error performing teardown in delete error: ", err)
 	}
