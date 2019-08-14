@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/golang/glog"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"regexp"
+	"strings"
+
+	"github.com/golang/glog"
 )
 
 type Status struct {
@@ -46,7 +47,7 @@ func (k Kapacitor) Load(f map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	
+
 	u := k.Host + tasks
 	res, err := k.Client.Post(u, "application/json", bytes.NewBuffer(j))
 	if err != nil {
@@ -118,6 +119,7 @@ func (k Kapacitor) Status(id string) (map[string]int, error) {
 			}
 		}
 	}
+	glog.Info("DEBUG:: Kapacitor status of ", id, " is ", f)
 	if sa == nil {
 		return nil, errors.New("kapacitor.status: expected alert.* key to be found on stats")
 	}
