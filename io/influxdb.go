@@ -41,7 +41,7 @@ func (influxdb Influxdb) Setup(db string, rp string) error {
 	if rp == "" {
 		rp = "autogen"
 	}
-	q := "q=CREATE DATABASE \"" + db + "\" WITH DURATION 1h REPLICATION 1 NAME \"" + rp + "\""
+	q := "q=CREATE DATABASE \"" + db + "\" WITH DURATION INF REPLICATION 1 NAME \"" + rp + "\""
 	baseUrl := influxdb.Host + "/query"
 	_, err := influxdb.Client.Post(baseUrl, "application/x-www-form-urlencoded",
 		bytes.NewBuffer([]byte(q)))
